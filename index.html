@@ -1,93 +1,81 @@
-
 <html>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
-   <head>
-      <title>Las Antipodas</title>
-      <style>
-         #map {
-         width: 500px;
-         height: 400px;
-         }
-         #mapUser {
-         width: 500px;
-         height: 400px;
-         }
-      </style>
-   </head>
-   <body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+	<head>
+		<meta charset="utf-8">
+		<title>Las Antipodas</title>
+		<link rel="stylesheet" type="text/css" href="antipodas.css">
+<style>
+#map_ubicacion, #map_antipodas {
+	width:500px;
+	height: 400px;
+	text-align: center;
+	margin: auto;
+}
 
-      <p id='geo'></p>
-      <p id="headmap">Mapa centrado en las Antipodas</p>
-      <p id='map'></p>
+h3 {
+	text-align: center;
+	margin: auto;
+}
+</style>
 
-      <div class="info_block_anti" float="left">
-         <h4 style="display:inline"> Antipodas</h4>
-         <div class="row">
-         </div>
-         <div class="row">
-         </div>
-      </div>
 
-      <p id="headmapuser">Tú ubicación</p>
-      <p id='mapUser'></p>
+	</head>
 
-      <div class="info_block_user" float="left">
-         <h4 style="display:inline">Coordenada de tu posicion actual</h4>
-         <div class="row"><span><span class="label">Latitud:</span><span class="value" id="lat_dec_user"></span></span>
-         </div>
-         <div class="row"><span><span class="label">Longitud:</span><span class="value" id="lon_dec_user"></span></span>
-         </div>
-      </div>
+	<body>
+		<h3>Ubicación actual:</h3><br>
+		<div id="map_ubicacion"></div>
+		<br><br>
+		<h3>Ubicación antipoda:</h3><br>
+		<div id="map_antipodas"></div>
 
-      <script type="text/javascript" charset="utf-8">
-         function compatible(elem, frase) {
-           writeElement = document.getElementById(elem);
-           writeElement.innerHTML = frase;
-         }
-         if (Modernizr.geolocation) {
-           compatible("geo", "Compatible con geolocalizacion.")
-           var options = {
-             enableHighAccuracy: true,
-             timeout: 5000,
-             maximumAge: 0
-           };
-           function success(posicion) {
-             var crd = posicion.coords;
-             compatible("lat_dec_user", crd.latitude);
-             compatible("lon_dec_user", crd.longitude)
-             var mapDivUser = document.getElementById("mapUser");
-             var mapUser = new google.maps.Map(mapDivUser, {
-               center: {
-                 lat: crd.latitude,
-                 lng: crd.longitude
-               },
-               zoom: 17
-             });
-             var infowindow = new google.maps.InfoWindow();
-             var marker;
-             marker = new google.maps.Marker({
-               position: new google.maps.LatLng(crd.latitude, crd.longitude),
-               map: mapUser
-             });
-           };
-           function error(err) {
-             console.warn('ERROR(' + err.code + '): ' + err.message);
-           };
-           function initMap() {
-             var mapDiv = document.getElementById("map");
-             var map = new google.maps.Map(mapDiv, {
-               center: {
-                 lat: -43.30673,
-                 lng:172.02284
-               },
-               zoom: 5
-             });
-             navigator.geolocation.getCurrentPosition(success, error, options);
-           }
-         } else {
-           compatible("geo", "No es compatible con geolocalizacion.")
-         };
-      </script>
-      <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
-   </body>
+		<script src = "https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+
+
+		<script type="text/javascript" charset="utf-8">
+		function ubicacion_antipoda(posicion){
+			var antipodes_lat = "";
+			var antipodes_lng = "";
+
+			antipodes_lat = -posicion.coords.latitude;
+			antipodes_lng = (posicion.coords.longitude + 180);
+
+
+			var mapDiv = document.getElementById("map_antipodas");
+
+			var map_antip = new google.maps.Map(mapDiv, {
+				center: {lat: antipodes_lat, lng: antipodes_lng},
+				zoom: 5
+			});
+		}
+
+		function ubicacion(posicion){
+			var lat = "";
+			var lng = "";
+
+			lat = posicion.coords.latitude;
+			lng = posicion.coords.longitude;
+
+			var mapDiv = document.getElementById("map_ubicacion");
+
+			var map_ubic = new google.maps.Map(mapDiv, {
+				center: {lat, lng},
+				zoom: 16
+			});
+
+			ubicacion_antipoda(posicion);
+		}
+
+		function getLocalization(){
+
+			if (Modernizr.geolocation) {
+				navigator.geolocation.getCurrentPosition(ubicacion, null);
+
+			} else {
+				alert("no es compatible");
+			}
+		}
+
+		getLocalization();
+    </script>
+	</body>
 </html>
